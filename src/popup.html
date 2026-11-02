@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>网页内容监控</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="popup-header">
+    <img id="app-logo" class="app-logo" src="../icons/icon16.png" alt="" width="24" height="24">
+    <div class="popup-titles">
+      <h1>网页内容监控</h1>
+      <p>DSH-IM → 微信提醒</p>
+    </div>
+    <span id="delivery-badge" class="badge badge-soft">加载中</span>
+  </header>
+
+  <main>
+    <!-- 一键监控当前页面的列表 -->
+    <section class="card main-card" aria-labelledby="quick-heading">
+      <div class="quick-head">
+        <h2 id="quick-heading">监控这个页面的列表</h2>
+        <p id="page-title" class="quick-title">正在读取当前页面…</p>
+        <p id="page-domain" class="quick-domain"></p>
+      </div>
+
+      <p id="page-unsupported" class="notice notice-warn" hidden>当前页面不支持监控（只支持 http / https 网页）。</p>
+
+      <button id="monitor-this-page" type="button" class="btn btn-primary btn-block">监控这个页面的列表</button>
+
+      <p id="probe-status" class="status" role="status"></p>
+
+      <div id="probe-result" hidden>
+        <p id="probe-summary" class="probe-summary"></p>
+        <ul id="probe-rows" class="probe-rows"></ul>
+        <div class="interval-row">
+          <label for="monitor-interval">检查间隔</label>
+          <select id="monitor-interval">
+            <option value="1">每 1 分钟</option>
+            <option value="3" selected>每 3 分钟</option>
+            <option value="5">每 5 分钟</option>
+            <option value="10">每 10 分钟</option>
+            <option value="30">每 30 分钟</option>
+          </select>
+        </div>
+        <button id="save-auto-watch" type="button" class="btn btn-primary btn-block">保存为监控项</button>
+        <p id="auto-save-status" class="status" role="status"></p>
+      </div>
+
+      <div id="probe-error" hidden>
+        <p id="probe-error-text" class="probe-error"></p>
+        <p id="probe-diagnostics" class="probe-diagnostics" hidden></p>
+        <button id="monitor-page-fallback" type="button" class="btn btn-primary btn-block">改为监控整页内容</button>
+        <div class="error-actions">
+          <button id="copy-diagnostics" type="button" class="btn btn-small" hidden>复制诊断信息</button>
+          <button id="probe-open-options" type="button" class="btn btn-small">打开设置手动配置</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 运行概览 -->
+    <h2 class="overview-head">运行概览</h2>
+    <section class="stat-grid" aria-label="运行概览">
+      <div class="stat">
+        <span class="stat-label">DSH 连通状态</span>
+        <strong id="dsh-state" class="stat-value">—</strong>
+        <span id="dsh-detail" class="stat-sub"></span>
+      </div>
+
+      <div class="stat">
+        <span class="stat-label">监控项</span>
+        <strong id="watch-count" class="stat-value">—</strong>
+        <span id="watch-detail" class="stat-sub">启用 / 全部</span>
+      </div>
+
+      <div class="stat stat-wide">
+        <span class="stat-label">最近一次检查时间</span>
+        <strong id="last-check" class="stat-value is-small">—</strong>
+      </div>
+
+      <div class="stat">
+        <span class="stat-label">本周变化次数</span>
+        <strong id="week-changes" class="stat-value">—</strong>
+        <span id="week-detail" class="stat-sub">按监控项最近变化时间统计</span>
+      </div>
+
+      <div class="stat">
+        <span class="stat-label">累计变化次数</span>
+        <strong id="total-changes" class="stat-value">—</strong>
+        <span class="stat-sub">来自运行时计数器</span>
+      </div>
+    </section>
+
+    <section id="error-panel" class="panel panel-error" aria-live="polite" hidden>
+      <h2>最近一条错误</h2>
+      <p id="latest-error"></p>
+    </section>
+
+    <section id="retry-panel" class="panel panel-warn" hidden>
+      <h2>待重试</h2>
+      <p id="retry-text"></p>
+    </section>
+
+    <div class="popup-actions">
+      <button id="run-check-all" type="button" class="btn">立即检查全部</button>
+      <button id="open-options" type="button" class="btn">打开设置</button>
+    </div>
+
+    <p id="popup-status" class="status" role="status"></p>
+
+    <footer class="popup-footer">
+      累计检查 <strong id="total-checks">0</strong> 次 · 投递成功 <strong id="total-sent">0</strong> / 失败 <strong id="total-failed">0</strong>
+    </footer>
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>网页内容监控 · 设置</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="page">
+    <header class="app-header">
+      <img id="app-logo" class="app-logo" src="../icons/icon48.png" alt="网页内容监控" width="40" height="40">
+      <div class="app-titles">
+        <h1>网页内容监控</h1>
+        <p>监控网页内容变化，并通过 DSH-IM 推送到微信</p>
+      </div>
+      <span id="header-state" class="badge badge-soft">正在加载…</span>
+    </header>
+
+    <main class="layout">
+      <!-- ① 一键添加监控 -->
+      <section class="card" aria-labelledby="auto-heading">
+        <div class="card-head">
+          <div>
+            <h2 id="auto-heading"><span class="step">1</span>一键添加监控</h2>
+            <p class="card-desc">在浏览器里打开要监控的页面，把网址贴进来，自动识别任务列表并添加，全程不用手动配置。</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field field-wide">
+            <label for="auto-url">页面地址</label>
+            <input id="auto-url" type="text" spellcheck="false"
+                   placeholder="https://example.com/tasks" autocomplete="off">
+            <p class="hint">登录态页面也能监控：先在本浏览器登录该站点，再填它的网址。</p>
+          </div>
+
+          <div class="field">
+            <label for="auto-interval">检查间隔</label>
+            <select id="auto-interval">
+              <option value="1">每 1 分钟</option>
+              <option value="3" selected>每 3 分钟</option>
+              <option value="5">每 5 分钟</option>
+              <option value="10">每 10 分钟</option>
+              <option value="30">每 30 分钟</option>
+            </select>
+            <p class="hint">任务状态变化频繁时，建议 1~3 分钟。</p>
+          </div>
+
+          <div class="field actions align-end">
+            <button id="auto-add-watch" type="button" class="btn btn-primary">自动识别并添加</button>
+            <button id="auto-add-page" type="button" class="btn">直接监控整页内容</button>
+            <button id="detect-current-tab" type="button" class="btn">用当前标签页识别</button>
+          </div>
+
+          <p class="hint field-wide">页面结构特殊？直接监控整页内容，也能在内容变化时提醒。</p>
+
+          <p id="auto-status" class="form-status field-wide" role="status"></p>
+          <p id="auto-diagnostics" class="probe-diagnostics field-wide" hidden></p>
+          <div class="actions field-wide">
+            <button id="copy-auto-diagnostics" type="button" class="btn btn-small" hidden>复制诊断信息</button>
+          </div>
+
+          <div id="auto-add-result" class="panel-card field-wide" hidden>
+            <div class="panel-head">
+              <h3 id="auto-add-summary">已添加</h3>
+            </div>
+            <ul id="auto-add-rows" class="auto-rows"></ul>
+            <p class="hint">首次检查只建立基线，之后内容变化会推送到微信。</p>
+            <div class="actions">
+              <button id="auto-baseline" type="button" class="btn btn-small">立即建立基线</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ② DSH 投递设置 -->
+      <section class="card" aria-labelledby="settings-heading">
+        <div class="card-head">
+          <div>
+            <h2 id="settings-heading"><span class="step">2</span>DSH 投递设置</h2>
+            <p class="card-desc">填写 DSH-IM 投递接口参数；Bot ID 与 Target ID 可从 DSH 设置页复制。</p>
+          </div>
+        </div>
+
+        <form id="settings-form" class="form-grid" autocomplete="off" novalidate>
+          <div class="field field-wide">
+            <label for="setting-dshBaseUrl">DSH Host 地址</label>
+            <input id="setting-dshBaseUrl" name="dshBaseUrl" type="text" spellcheck="false"
+                   placeholder="http://127.0.0.1:52020">
+            <p class="hint">默认 <code>http://127.0.0.1:52020</code>，保存时会自动去掉结尾的 <code>/</code>。</p>
+          </div>
+
+          <div class="field">
+            <label for="setting-botId">Bot ID</label>
+            <input id="setting-botId" name="botId" type="text" spellcheck="false" placeholder="wx_xxx / bot_xxx">
+            <p class="hint">从 DSH 设置页原样复制。不按前缀推断渠道：微信是 <code>wx_</code>，飞书是 <code>bot_</code>。</p>
+          </div>
+
+          <div class="field">
+            <label for="setting-targetId">Target ID</label>
+            <input id="setting-targetId" name="targetId" type="text" spellcheck="false"
+                   placeholder="tgt_xxx / release-alerts">
+            <p class="hint">新建投递目标时自己起的别名，形如 <code>tgt_xxx</code> 或 <code>release-alerts</code>。</p>
+          </div>
+
+          <div class="field field-wide">
+            <div class="check-list">
+              <label class="check">
+                <input id="setting-localFallback" name="localFallback" type="checkbox">
+                <span>DSH 投递失败时，同时发送本地浏览器通知作为兜底</span>
+              </label>
+              <label class="check">
+                <input id="setting-quiet" name="quiet" type="checkbox">
+                <span>安静模式：不发送本地通知，仅通过 DSH 投递</span>
+              </label>
+              <label class="check">
+                <input id="setting-silentTabs" name="silentTabs" type="checkbox" checked>
+                <span>静默抓取：在隐藏窗口里抓，不显示标签页（推荐开启）</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="actions field-wide">
+            <button id="save-settings" type="button" class="btn btn-primary">保存设置</button>
+            <button id="test-delivery" type="button" class="btn">测试发送</button>
+            <span id="settings-status" class="form-status" role="status"></span>
+          </div>
+
+          <p id="test-result" class="result field-wide" role="status" hidden></p>
+        </form>
+      </section>
+
+      <!-- ③ 监控项列表 + 高级表单 -->
+      <section class="card" aria-labelledby="watches-heading">
+        <div class="card-head">
+          <div>
+            <h2 id="watches-heading"><span class="step">3</span>监控项<span id="watch-count" class="count-badge">0</span></h2>
+            <p class="card-desc">已添加的监控项都在这里，可单独启用/停用、编辑或立即检查。</p>
+          </div>
+          <div class="head-actions">
+            <button id="run-check-all" type="button" class="btn btn-small">立即检查全部</button>
+            <button id="add-watch" type="button" class="btn btn-small">＋ 新增监控项</button>
+          </div>
+        </div>
+
+        <div id="watch-list" class="watch-list"></div>
+        <p id="list-status" class="form-status" role="status"></p>
+
+        <details id="advanced-form" class="advanced">
+          <summary>高级：手动填写选择器（一般不需要）</summary>
+          <div class="advanced-body">
+            <form id="watch-form" class="watch-form" autocomplete="off" novalidate>
+              <div class="form-section-head">
+                <h3 id="watch-form-title">新增监控项</h3>
+                <p class="card-desc">保存后会立即生效；「自动识别并添加」失败时，再到这里手动配置。</p>
+              </div>
+
+              <div class="form-grid">
+                <div class="field field-wide">
+                  <label for="watch-name">名称</label>
+                  <input id="watch-name" name="name" type="text" maxlength="80"
+                         placeholder="例如：算力平台任务列表" autocomplete="off">
+                </div>
+
+                <div class="field field-wide">
+                  <label for="watch-url">页面 URL</label>
+                  <input id="watch-url" name="url" type="text" spellcheck="false"
+                         placeholder="https://example.com/tasks" autocomplete="off">
+                  <p class="hint">监控登录态页面时，建议抓取方式选「tab · 后台标签页渲染后读取」，并保持 Chrome 已登录该站点。</p>
+                </div>
+
+                <div class="field">
+                  <label for="watch-mode">抓取方式</label>
+                  <select id="watch-mode" name="mode">
+                    <option value="direct">direct · 后台直接抓取 HTML</option>
+                    <option value="tab">tab · 后台标签页渲染后读取</option>
+                  </select>
+                  <p id="mode-hint" class="hint">direct：直接 fetch 页面 HTML，速度快，但拿不到 JS 渲染出来的内容。</p>
+                </div>
+
+                <div class="field">
+                  <label for="watch-extractMode">监控方式</label>
+                  <select id="watch-extractMode" name="extractMode">
+                    <option value="single">single · 单值内容</option>
+                    <option value="rows">rows · 列表逐行对比</option>
+                  </select>
+                  <p id="extract-mode-hint" class="hint">single：盯一段文字 / HTML / 属性；rows：盯列表里每一行的状态列。</p>
+                </div>
+
+                <!-- single 模式字段 -->
+                <div id="watch-single-fields" class="field-group field-wide">
+                  <div class="form-grid form-grid-inner">
+                    <div class="field">
+                      <label for="watch-selectorType">选择器类型</label>
+                      <select id="watch-selectorType" name="selectorType">
+                        <option value="css">CSS 选择器</option>
+                        <option value="xpath">XPath</option>
+                      </select>
+                    </div>
+
+                    <div class="field">
+                      <label for="watch-valueKind">取值方式</label>
+                      <select id="watch-valueKind" name="valueKind">
+                        <option value="text">text · 文本内容</option>
+                        <option value="html">html · 内部 HTML</option>
+                        <option value="attr">attr · 元素属性</option>
+                      </select>
+                    </div>
+
+                    <div class="field field-wide">
+                      <label for="watch-selector">选择器</label>
+                      <input id="watch-selector" name="selector" type="text" spellcheck="false"
+                             placeholder="#notice .title" autocomplete="off">
+                      <p id="selector-hint" class="hint">CSS 选择器：如 <code>#notice .title</code>（对应 document.querySelector）。</p>
+                    </div>
+
+                    <div class="field">
+                      <label for="watch-attrName">属性名（取值方式为 attr 时必填）</label>
+                      <input id="watch-attrName" name="attrName" type="text" spellcheck="false"
+                             placeholder="例如 href / data-price" autocomplete="off" disabled>
+                    </div>
+
+                    <div class="field">
+                      <label for="watch-keyword">关键词过滤（可选，single 模式）</label>
+                      <input id="watch-keyword" name="keyword" type="text"
+                             placeholder="仅当新值包含该字符串时才提醒" autocomplete="off">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- rows 模式字段 -->
+                <div id="watch-rows-fields" class="field-group field-wide" hidden>
+                  <div class="form-grid form-grid-inner">
+                    <div class="field field-wide">
+                      <label for="watch-rowSelector">行选择器</label>
+                      <input id="watch-rowSelector" name="rowSelector" type="text" spellcheck="false"
+                             placeholder="tbody tr" autocomplete="off">
+                      <p class="hint">一行一个任务，例如 <code>tbody tr</code> 或 <code>.arco-table-tr</code>；只支持 CSS。</p>
+                    </div>
+
+                    <div class="field">
+                      <label for="watch-keySelector">行键选择器（行内相对 CSS）</label>
+                      <input id="watch-keySelector" name="keySelector" type="text" spellcheck="false"
+                             placeholder="td:nth-child(1)" autocomplete="off">
+                      <p class="hint">行内相对 CSS，取任务名/ID，例如 <code>td:nth-child(1)</code>；留空 = 整行文本。</p>
+                    </div>
+
+                    <div class="field">
+                      <label for="watch-statusSelector">状态选择器（行内相对 CSS）</label>
+                      <input id="watch-statusSelector" name="statusSelector" type="text" spellcheck="false"
+                             placeholder="td:nth-child(5)" autocomplete="off">
+                      <p class="hint">行内相对 CSS，取状态，例如 <code>td:nth-child(5)</code>；必填。</p>
+                    </div>
+
+                    <div class="field">
+                      <label for="watch-keyAttr">行键属性名（可选）</label>
+                      <input id="watch-keyAttr" name="keyAttr" type="text" spellcheck="false"
+                             placeholder="data-job-id" autocomplete="off">
+                      <p class="hint">留空则取文本，填了就取该属性。</p>
+                    </div>
+
+                    <div class="field">
+                      <label for="watch-statusAttr">状态属性名（可选）</label>
+                      <input id="watch-statusAttr" name="statusAttr" type="text" spellcheck="false"
+                             placeholder="title" autocomplete="off">
+                      <p class="hint">留空则取文本，填了就取该属性。</p>
+                    </div>
+
+                    <div class="field field-wide">
+                      <label for="watch-onlyStatuses">只看这些状态（可选）</label>
+                      <input id="watch-onlyStatuses" name="onlyStatuses" type="text"
+                             placeholder="已完成,失败" autocomplete="off">
+                      <p class="hint">逗号分隔，例如 <code>已完成,失败</code>；留空 = 任何状态变化都提醒。</p>
+                    </div>
+
+                    <div class="field field-wide">
+                      <div class="check-list">
+                        <label class="check">
+                          <input id="watch-rowsNotifyAdded" name="rowsNotifyAdded" type="checkbox" checked>
+                          <span>新出现的任务行也提醒</span>
+                        </label>
+                        <label class="check">
+                          <input id="watch-rowsNotifyRemoved" name="rowsNotifyRemoved" type="checkbox">
+                          <span>任务行消失时提醒（分页/排序会误报，建议关闭）</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="field field-wide">
+                      <p class="hint">列表模式只支持 CSS；建议配合 tab 抓取方式，并把「等待选择器」填成行选择器。</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- tab 模式等待字段 -->
+                <div id="watch-tab-fields" class="field-group field-wide" hidden>
+                  <div class="form-grid form-grid-inner">
+                    <div class="field">
+                      <label for="watch-waitForSelector">等待选择器（tab 模式）</label>
+                      <input id="watch-waitForSelector" name="waitForSelector" type="text" spellcheck="false"
+                             placeholder=".task-table tbody tr" autocomplete="off">
+                      <p class="hint">tab 模式：出现该 CSS 选择器后再抓取（最多 25s）；列表监控建议填行选择器。</p>
+                    </div>
+
+                    <div class="field">
+                      <label for="watch-settleMs">额外等待（毫秒，tab 模式）</label>
+                      <input id="watch-settleMs" name="settleMs" type="number" min="0" max="20000" step="100" value="1500">
+                      <p class="hint">页面加载完成后再等多少毫秒（0–20000），给 SPA 渲染时间。</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field field-wide">
+                  <label for="watch-intervalMinutes">检查间隔（分钟）</label>
+                  <input id="watch-intervalMinutes" name="intervalMinutes" type="number"
+                         min="0.5" max="1440" step="0.5" value="5">
+                  <p class="hint">范围 0.5 ~ 1440 分钟，最短 30 秒。</p>
+                </div>
+
+                <div class="field field-wide">
+                  <div class="check-list">
+                    <label class="check">
+                      <input id="watch-ignoreEmpty" name="ignoreEmpty" type="checkbox" checked>
+                      <span>忽略空值（提取结果为空时视为未取到内容，不更新基线）</span>
+                    </label>
+                    <label class="check">
+                      <input id="watch-notifyOnFirstRun" name="notifyOnFirstRun" type="checkbox">
+                      <span>首次建立基线时提醒一次</span>
+                    </label>
+                    <label class="check">
+                      <input id="watch-enabled" name="enabled" type="checkbox" checked>
+                      <span>启用该监控项</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="actions">
+                <button id="save-watch" type="button" class="btn btn-primary">保存监控项</button>
+                <button id="cancel-watch" type="button" class="btn">重置表单</button>
+                <button id="detect-table" type="button" class="btn">自动探测表格结构</button>
+                <button id="preview-watch" type="button" class="btn">预览提取结果</button>
+                <span id="watch-form-status" class="form-status" role="status"></span>
+              </div>
+
+              <!-- 自动探测结果（可点选其他候选填入表单） -->
+              <div id="detect-result" class="panel-card" hidden>
+                <div class="panel-head">
+                  <h3>自动探测结果</h3>
+                  <span id="detect-summary" class="panel-sub"></span>
+                </div>
+                <div id="detect-candidates" class="candidate-list"></div>
+              </div>
+
+              <!-- 预览提取结果（single: 文本；rows: 键 / 状态表格） -->
+              <div id="preview-result" class="panel-card" hidden>
+                <div class="panel-head">
+                  <h3>预览提取结果</h3>
+                  <span id="preview-summary" class="panel-sub"></span>
+                </div>
+                <div id="preview-body" class="preview-body"></div>
+              </div>
+            </form>
+          </div>
+        </details>
+      </section>
+
+      <!-- ④ 运行状态 -->
+      <section class="card" aria-labelledby="runtime-heading">
+        <div class="card-head">
+          <div>
+            <h2 id="runtime-heading"><span class="step">4</span>运行状态</h2>
+            <p class="card-desc">来自扩展后台的最近一次扫描与投递情况。</p>
+          </div>
+          <div class="head-actions">
+            <button id="refresh-state" type="button" class="btn btn-small">刷新状态</button>
+          </div>
+        </div>
+
+        <div class="runtime-grid">
+          <div class="stat-box">
+            <span class="stat-label">最近扫描</span>
+            <strong id="runtime-sweep" class="stat-value">—</strong>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">最近投递</span>
+            <strong id="runtime-delivery-at" class="stat-value">—</strong>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">投递结果</span>
+            <strong id="runtime-delivery-state" class="stat-value">—</strong>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">检查次数</span>
+            <strong id="runtime-checks" class="stat-value">0</strong>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">变化次数</span>
+            <strong id="runtime-changes" class="stat-value">0</strong>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">投递成功 / 失败</span>
+            <strong id="runtime-sent-failed" class="stat-value">0 / 0</strong>
+          </div>
+        </div>
+
+        <div id="runtime-retry" class="notice notice-warn" role="status" hidden></div>
+        <div id="runtime-error" class="notice notice-error" role="status" hidden></div>
+      </section>
+
+      <footer class="page-footer">
+        配置统一保存在 <code>chrome.storage.local</code>，由扩展后台负责调度与投递。
+      </footer>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="options.js"></script>
+</body>
+</html>

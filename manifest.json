@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "DSH 网页监控 · 微信提醒",
+  "version": "1.2.0",
+  "description": "监控指定网页的指定内容，一旦变化就通过 DSH-IM 机器人把提醒推送到微信。",
+  "minimum_chrome_version": "116",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications",
+    "scripting",
+    "offscreen",
+    "permissions"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1/*",
+    "http://localhost/*",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "DSH 网页监控",
+    "default_popup": "src/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_ui": {
+    "page": "src/options.html",
+    "open_in_tab": true
+  }
+}

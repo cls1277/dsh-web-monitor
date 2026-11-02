@@ -1,0 +1,61 @@
+name: test
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  node-tests:
+    name: node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Pure-function self test
+        run: node tools/selftest.mjs
+
+      - name: Background integration test
+        run: node tools/integration.mjs
+
+  package-check:
+    name: manifest sanity
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate manifest + required files
+        run: |
+          node -e "
+            const fs = require('fs');
+            const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
+            if (manifest.manifest_version !== 3) throw new Error('must be MV3');
+            for (const file of [manifest.background.service_worker, manifest.options_ui.page, manifest.action.default_popup]) {
+              if (!fs.existsSync(file)) throw new Error('missing: ' + file);
+            }
+            for (const icon of Object.values(manifest.icons)) {
+              if (!fs.existsSync(icon)) throw new Error('missing icon: ' + icon);
+            }
+            console.log('manifest ok', manifest.version);
+          "

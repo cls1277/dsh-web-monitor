@@ -1,0 +1,13 @@
+# Test artifacts
+.tmp/
+*.crx
+*.pem
+
+# Node
+node_modules/
+npm-debug.log*
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db

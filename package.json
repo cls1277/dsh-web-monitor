@@ -1,0 +1,39 @@
+{
+  "name": "dsh-web-monitor",
+  "version": "1.2.0",
+  "private": true,
+  "description": "Chrome MV3 extension that watches web pages and pushes change notifications to WeChat via DeepSeek Harness IM bot.",
+  "type": "module",
+  "scripts": {
+    "test": "node tools/selftest.mjs && node tools/integration.mjs",
+    "test:unit": "node tools/selftest.mjs",
+    "test:integration": "node tools/integration.mjs",
+    "test:browser": "node tools/browser-e2e.mjs",
+    "probe": "node tools/probe-delivery.mjs",
+    "icons": "python tools/make-icons.py"
+  },
+  "license": "MIT",
+  "author": "cls1277",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cls1277/dsh-web-monitor.git"
+  },
+  "homepage": "https://github.com/cls1277/dsh-web-monitor#readme",
+  "bugs": {
+    "url": "https://github.com/cls1277/dsh-web-monitor/issues"
+  },
+  "keywords": [
+    "chrome-extension",
+    "manifest-v3",
+    "web-monitor",
+    "page-monitor",
+    "wechat",
+    "deepseek-harness",
+    "dsh",
+    "notification",
+    "alerting"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}
